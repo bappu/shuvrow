@@ -1,93 +1,143 @@
 import simplegui
-width_move=400
-height_move=200
-up_key=0
-#defult left key
-left_key=0
-down_key=0
-right_key=0
-#count=200
-image_width=100
-image_height=100
-def down_handler(key):
-    global height_move,width_move,up_key,left_key,right_key,down_left
-    if key == simplegui.KEY_MAP["up"]:
-        height_move=height_move-1
-        print "Works"
-        up_key=1
-        down_key=0
-        left_key=1
-        right_key=0
-        
-#def up_handler(key):
-#    global height_move
-    if key == simplegui.KEY_MAP["down"]:
-        height_move=height_move+1
-        print "Works"
-        down_key=1
-        left_key=1
-        right_key=0
-        up_key=0
-    if key == simplegui.KEY_MAP["left"]:
-        #height_move=height_move+1
-        width_move=width_move-1
-        print "Works"
-        left_key=0
-        down_key=0
-        right_key=0
-        up_key=0
-    if key == simplegui.KEY_MAP["right"]:
-        width_move=width_move+1
-        print "Works"
-        right_key=1
-        down_key=0
-        left_key=1
-        up_key=0
-    
-    
+import random
 
-def draw(canvas):
-    global width_move,height_move,up_key,down_key,left_key,right_key
-    if up_key==1:
-        
-        canvas.draw_image(image,(image_width/2,image_height/2),(image_width,image_height),(width_move,height_move),(30,30))
-        width_move=width_move-1
-        height_move=height_move-1
-    #print move
-    if left_key==0:
-        if width_move >0:        
-            canvas.draw_image(image,(image_width/2,image_height/2),(image_width,image_height),(width_move,height_move),(30,30))
-        if width_move==0:
-            width_move=400    
+frame_width=300
+frame_height=300
+x_axis=50
+y_axis=70
+rand_x=90
+rand_y=20
+#random point for snake tales
+
+r_x=random.randrange(0,300)
+r_y=random.randrange(0,300)
+increment=20
+
+left=False
+right=True
+up=False
+down=False
+
+
+
+def rand_line():
+    global rand_x,rand_y,frame_width,frame_height
+    rand_x=random.randrange(20,280)
+    rand_y=random.randrange(20,280)
     
-    
-    if down_key==1:
+    return
+def move_snake_head():
+    global x_axis,y_axis
+    if right==True:
+        x_axis=x_axis+1
+        if x_axis==frame_width:
+            x_axis=0
+            return
+  
+    if left==True:
+        x_axis=x_axis-1
+        if x_axis==0:
+            x_axis=300
+            return
+
+    if up==True:
+        y_axis=y_axis-1
+        if y_axis==0:
+            y_axis=300
+            
+            return
+ 
+    if down==True:
+        y_axis=y_axis+1
+        if y_axis==300:
+            y_axis=0
+            return
+      
+def draw(canvas):  
+    global x_axis,y_axis,r_x,r_y,increment
+    canvas.draw_line([r_x,r_y],[r_x+20,r_y],5,'Cyan')
+    if x_axis==r_x and y_axis==r_y:
         
-        canvas.draw_image(image,(image_width/2,image_height/2),(image_width,image_height),(width_move,height_move),(30,30))
-        width_move=width_move-1
-        height_move=height_move+1
+        increment=increment+20
+        print increment
+        canvas.draw_line([x_axis,y_axis],[x_axis+increment,y_axis],5,'Cyan')
+        r_x=random.randrange(0,290)
+        r_y=random.randrange(0,290)
+        return
+    elif x_axis != r_x:
+        canvas.draw_line([x_axis,y_axis],[x_axis+increment,y_axis],5,'Cyan')
+  
     
-#    elif move >200:
-#        global count
-#        print count
-#        canvas.draw_image(image,(100/2,100/2),(100,100),(200+count,200),(30,30))
-#        count=count-1
-#        if count == 1:
-#            
-#            count=200
-        
-        
-        
-def timer():
-    global width_move
-    width_move=width_move-1
+#    canvas.draw_line([rand_x,rand_y],[rand_x+20,rand_y],12,'Cyan')
+
+def time():
+    move_snake_head()
+
+def key_handler(key):
+    global x_axis,y_axis,left,right,up,down
+    if key==simplegui.KEY_MAP['left']:
+        #If right button is active, than snake will unable to move to left
+        if right==True:
+            left=False
+            right=True
+            up=False
+            down=False
+            return
+        #x_axis= x_axis-2
+        else: 
+            left=True
+            right=False
+            up=False
+            down=False
+            return
     
+    if key==simplegui.KEY_MAP['right']:
+        #x_axis= x_axis+2
+        
+        if left==True:
+            left=True
+            right=False
+            up=False
+            down=False
+            return
+        else:
+            left=False
+            right=True
+            up=False
+            down=False
     
-frame=simplegui.create_frame("Test",400,400)
-image=simplegui.load_image('https://dl.dropboxusercontent.com/u/68965335/panda-images/angry12.jpg')
-time=simplegui.create_timer(50,timer)
-drawing=frame.set_draw_handler(draw)
-frame.set_keydown_handler(down_handler)
-#frame.set_keyup_handler(up_handler)
+    if key==simplegui.KEY_MAP['up']:
+        #y_axis= y_axis-2       
+        
+        if down==True:
+            left=False
+            right=False
+            up=False
+            down=True
+            return
+        else: 
+            left=False
+            right=False
+            up=True
+            down=False
+            return
+    if key==simplegui.KEY_MAP['down']:
+        #y_axis= y_axis+2  
+        if up==True:
+            left=False
+            right=False
+            up=True
+            down=False
+            return
+        else:
+            left=False
+            right=False
+            up=False
+            down=True
+
+frame=simplegui.create_frame("Snake Game",frame_width,frame_height)
+timer=simplegui.create_timer(50,time)
+frame.set_draw_handler(draw)
+frame.set_keydown_handler(key_handler)
 frame.start()
-time.start()
+timer.start()
